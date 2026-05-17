@@ -1,0 +1,26 @@
+name: auth-generator
+version: 1.0.0
+description: Genera sistemas de autenticación completos con Vite+React+Tailwind+Node+MySQL
+author: Atlas Agent Team
+
+capabilities:
+  - generate-auth-system
+  - create-mysql-schema
+  - create-react-frontend
+  - create-node-backend
+  - setup-jwt-auth
+
+configuration:
+  required_env:
+    - ALIBABA_API_KEY
+    - DB_HOST
+    - DB_PORT
+    - DB_USER
+    - DB_PASSWORD
+    - DB_NAME
+    - JWT_SECRET
+
+  default_options:
+    port: 3000
+    frontend_port: 5173
+    db_charset: utf8mb4

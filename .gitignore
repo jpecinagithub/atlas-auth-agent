@@ -1,0 +1,15 @@
+# Credenciales — nunca al repositorio
+.env
+
+# Dependencias
+node_modules/
+
+# Build del harness
+harness/dist/
+
+# Datos persistidos por el agente (historial de generaciones)
+.agent-data/
+
+# Logs
+agent.log
+*.log

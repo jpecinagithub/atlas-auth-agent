@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "skills": [
+    {
+      "id": "auth-generator",
+      "name": "Auth Generator",
+      "description": "Genera sistemas de autenticación completos",
+      "path": "skills/auth-generator"
+    }
+  ]
+}
