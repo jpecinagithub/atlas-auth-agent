@@ -591,20 +591,34 @@ async function deployProject(targetFolder, files) {
   logger.info('[DEPLOY] Levantando backend...')
   try {
     const backendFolder = path.join(targetFolder, 'backend')
-    const backendProc = spawn('cmd.exe', ['/c', 'npm start'], {
+
+    // Forzar PORT y credenciales DB correctas en el .env generado
+    const backendPort = parseInt(process.env.BACKEND_PORT || '3050')
+    const envFilePath = path.join(backendFolder, '.env')
+    if (await fs.pathExists(envFilePath)) {
+      let envContent = await fs.readFile(envFilePath, 'utf-8')
+      envContent = envContent.replace(/^PORT=.*/m, `PORT=${backendPort}`)
+      if (!/^PORT=/m.test(envContent)) envContent += `\nPORT=${backendPort}`
+      if (process.env.DB_USER) envContent = envContent.replace(/^DB_USER=.*/m, `DB_USER=${process.env.DB_USER}`)
+      if (process.env.DB_PASSWORD) envContent = envContent.replace(/^DB_PASSWORD=.*/m, `DB_PASSWORD=${process.env.DB_PASSWORD}`)
+      await fs.writeFile(envFilePath, envContent)
+    }
+
+    const isWin = process.platform === 'win32'
+    const backendProc = spawn(isWin ? 'cmd.exe' : 'sh',
+      isWin ? ['/c', 'npm start'] : ['-c', 'npm start'], {
       cwd: backendFolder,
       detached: true,
-      stdio: 'ignore',
-      shell: true
+      stdio: 'ignore'
     })
     backendProc.unref()
 
-    const backendPort = parseInt(envVars.PORT || '3000')
+    const publicHost = process.env.PUBLIC_HOST || 'localhost'
     logger.info(`[DEPLOY] Esperando puerto ${backendPort}...`)
     await waitForPort(backendPort)
     results.backend = true
-    results.urls.backend = `http://localhost:${backendPort}`
-    logger.info(`[DEPLOY] Backend activo en http://localhost:${backendPort}`)
+    results.urls.backend = `http://${publicHost}:${backendPort}`
+    logger.info(`[DEPLOY] Backend activo en http://${publicHost}:${backendPort}`)
   } catch (e) {
     results.errors.push(`Backend start: ${e.message}`)
   }
@@ -629,20 +643,22 @@ async function deployProject(targetFolder, files) {
 
       // 6. Levantar frontend
       logger.info('[DEPLOY] Levantando frontend...')
-      const frontendProc = spawn('cmd.exe', ['/c', 'npm run dev'], {
+      const isWin = process.platform === 'win32'
+      const frontendProc = spawn(isWin ? 'cmd.exe' : 'sh',
+        isWin ? ['/c', 'npm run dev'] : ['-c', 'npm run dev'], {
         cwd: frontendFolder,
         detached: true,
-        stdio: 'ignore',
-        shell: true
+        stdio: 'ignore'
       })
       frontendProc.unref()
 
       const frontendPort = parseInt(process.env.FRONTEND_PORT || '1600')
+      const publicHost = process.env.PUBLIC_HOST || 'localhost'
       logger.info(`[DEPLOY] Esperando puerto ${frontendPort}...`)
       await waitForPort(frontendPort)
       results.frontend = true
-      results.urls.frontend = `http://localhost:${frontendPort}`
-      logger.info(`[DEPLOY] Frontend activo en http://localhost:${frontendPort}`)
+      results.urls.frontend = `http://${publicHost}:${frontendPort}`
+      logger.info(`[DEPLOY] Frontend activo en http://${publicHost}:${frontendPort}`)
     }
   } catch (e) {
     results.errors.push(`Frontend: ${e.message}`)
