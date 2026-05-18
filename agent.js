@@ -608,12 +608,9 @@ async function deployProject(targetFolder, files) {
     }
 
     const isWin = process.platform === 'win32'
-    const backendProc = spawn(isWin ? 'cmd.exe' : 'sh',
-      isWin ? ['/c', 'npm start'] : ['-c', 'npm start'], {
-      cwd: backendFolder,
-      detached: true,
-      stdio: 'ignore'
-    })
+    const backendProc = isWin
+      ? spawn('cmd.exe', ['/c', 'npm start'], { cwd: backendFolder, detached: true, stdio: 'ignore', shell: true })
+      : spawn('/usr/bin/node', ['server.js'], { cwd: backendFolder, detached: true, stdio: 'ignore', env: { ...process.env, PORT: String(backendPort) } })
     backendProc.unref()
 
     const publicHost = process.env.PUBLIC_HOST || 'localhost'
@@ -647,15 +644,11 @@ async function deployProject(targetFolder, files) {
       // 6. Levantar frontend
       logger.info('[DEPLOY] Levantando frontend...')
       const isWin = process.platform === 'win32'
-      const frontendProc = spawn(isWin ? 'cmd.exe' : 'sh',
-        isWin ? ['/c', 'npm run dev'] : ['-c', 'npm run dev'], {
-        cwd: frontendFolder,
-        detached: true,
-        stdio: 'ignore'
-      })
-      frontendProc.unref()
-
       const frontendPort = parseInt(process.env.FRONTEND_PORT || '1600')
+      const frontendProc = isWin
+        ? spawn('cmd.exe', ['/c', 'npm run dev'], { cwd: frontendFolder, detached: true, stdio: 'ignore', shell: true })
+        : spawn('/usr/bin/npm', ['run', 'dev'], { cwd: frontendFolder, detached: true, stdio: 'ignore', env: { ...process.env, PORT: String(frontendPort) } })
+      frontendProc.unref()
       const publicHost = process.env.PUBLIC_HOST || 'localhost'
       logger.info(`[DEPLOY] Esperando puerto ${frontendPort}...`)
       await waitForPort(frontendPort)
