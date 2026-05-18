@@ -537,9 +537,12 @@ async function deployProject(targetFolder, files) {
     }
   })
 
-  const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = envVars
+  const DB_HOST = envVars.DB_HOST || 'localhost'
   const DB_PORT = envVars.DB_PORT || '3306'
-  logger.info(`[DEPLOY] DB: ${DB_HOST}:${DB_PORT}/${DB_NAME}`)
+  const DB_NAME = envVars.DB_NAME
+  const DB_USER = process.env.DB_USER || envVars.DB_USER
+  const DB_PASSWORD = process.env.DB_PASSWORD || envVars.DB_PASSWORD
+  logger.info(`[DEPLOY] DB: ${DB_HOST}:${DB_PORT}/${DB_NAME} user=${DB_USER}`)
 
   // 2. Crear Base de Datos y ejecutar SQL
   logger.info('[DEPLOY] Creando base de datos...')
