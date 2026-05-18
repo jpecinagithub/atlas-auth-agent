@@ -551,7 +551,7 @@ async function deployProject(targetFolder, files) {
     const seedsFile  = files.find(f => f.path.includes('seeds.sql'))
 
     if (schemaFile) {
-      await execAsync(`mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME}"`)
+      await execAsync(`mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASSWORD} -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME}"`)
       logger.info(`[DEPLOY] Base de datos '${DB_NAME}' lista`)
 
       const schemaPath = path.join(targetFolder, schemaFile.path)
