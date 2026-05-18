@@ -1,5 +1,6 @@
 # Credenciales — nunca al repositorio
 .env
+.env.server
 
 # Dependencias
 node_modules/

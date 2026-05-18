@@ -70,6 +70,7 @@ mi-proyecto/
 - Middleware authenticateToken para rutas protegidas
 
 ### 3. backend/.env
+PORT=3050
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
@@ -124,9 +125,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
+    port: 1600,
     proxy: {
-      '/api': 'http://localhost:3000'
+      '/api': 'http://localhost:3050'
     }
   }
 })

@@ -90,7 +90,7 @@ async function callLLM(messages, stack = { db: 'mysql' }) {
   logger.info(`[LLM] model=${model} db=${stack.db} mensajes=${messages.length}`)
 
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), 120000)
+  const timeoutId = setTimeout(() => controller.abort(), 300000)
 
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
@@ -537,7 +537,8 @@ async function deployProject(targetFolder, files) {
     }
   })
 
-  const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = envVars
+  const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = envVars
+  const DB_PORT = envVars.DB_PORT || '3306'
   logger.info(`[DEPLOY] DB: ${DB_HOST}:${DB_PORT}/${DB_NAME}`)
 
   // 2. Crear Base de Datos y ejecutar SQL
@@ -636,11 +637,12 @@ async function deployProject(targetFolder, files) {
       })
       frontendProc.unref()
 
-      logger.info('[DEPLOY] Esperando puerto 5173...')
-      await waitForPort(5173)
+      const frontendPort = parseInt(process.env.FRONTEND_PORT || '1600')
+      logger.info(`[DEPLOY] Esperando puerto ${frontendPort}...`)
+      await waitForPort(frontendPort)
       results.frontend = true
-      results.urls.frontend = 'http://localhost:5173'
-      logger.info('[DEPLOY] Frontend activo en http://localhost:5173')
+      results.urls.frontend = `http://localhost:${frontendPort}`
+      logger.info(`[DEPLOY] Frontend activo en http://localhost:${frontendPort}`)
     }
   } catch (e) {
     results.errors.push(`Frontend: ${e.message}`)

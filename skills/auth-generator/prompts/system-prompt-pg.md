@@ -84,7 +84,7 @@ DB_PASSWORD=postgres
 DB_NAME=auth_db
 JWT_SECRET=supersecretkey12345678901234567890
 JWT_EXPIRES_IN=24h
-PORT=3000
+PORT=3050
 ```
 
 ### 4. backend/schema.sql
@@ -148,8 +148,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
-    proxy: { '/api': 'http://localhost:3000' }
+    port: 1600,
+    proxy: { '/api': 'http://localhost:3050' }
   }
 })
 ```
